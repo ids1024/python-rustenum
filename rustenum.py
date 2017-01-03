@@ -1,4 +1,4 @@
-class AlgebraicVariantBase(tuple):
+class RustEnumVariantBase(tuple):
     def __new__(cls, *args):
         if len(args) != cls._num:
             name = type(cls).__name__ + '.' + cls.__name__
@@ -32,26 +32,26 @@ class AlgebraicVariantBase(tuple):
             return kwargs['_']()
 
 
-class AlgebraicBase(type):
+class RustEnumBase(type):
     def __repr__(self):
         name = type(self).__name__ + '.' + self.__name__
         return "<{}>".format(name)
    
 
-class Algebraic(type):
+class RustEnum(type):
     def __new__(cls, name, **kwargs):
-        return super().__new__(cls, name, (AlgebraicBase,), {"_name": name})
+        return super().__new__(cls, name, (RustEnumBase,), {"_name": name})
 
     def __init__(self, name, **kwargs):
         super().__init__(name, (type,), {})
         self._variants = []
         for k, v in kwargs.items():
-            instance = self(k, (AlgebraicVariantBase,), {"_num": v})
+            instance = self(k, (RustEnumVariantBase,), {"_num": v})
             self._variants.append(instance)
             setattr(self, k, instance)
 
     def __repr__(self):
-        return "<algebraic '" + self.__name__ + "'>"
+        return "<rustenum '" + self.__name__ + "'>"
 
     def __iter__(self):
         return iter(self._variants)
