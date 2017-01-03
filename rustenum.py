@@ -1,3 +1,6 @@
+import types
+
+
 class RustEnumVariantBase(tuple):
     def __new__(cls, *args):
         if len(args) != cls._num:
@@ -8,6 +11,11 @@ class RustEnumVariantBase(tuple):
     def __repr__(self):
         name = type(type(self)).__name__ + '.' + type(self).__name__
         return "{}({})".format(name, ', '.join(repr(i) for i in self))
+
+    def __getattr__(self, name):
+        if name in type(type(self))._impls:
+            return types.MethodType(type(type(self))._impls[name], self)
+        raise AttributeError
 
     def match(self, **kwargs):
         variants = [i.__name__ for i in type(type(self))]
@@ -36,7 +44,7 @@ class RustEnumBase(type):
     def __repr__(self):
         name = type(self).__name__ + '.' + self.__name__
         return "<{}>".format(name)
-   
+
 
 class RustEnum(type):
     def __new__(cls, name, **kwargs):
@@ -45,6 +53,7 @@ class RustEnum(type):
     def __init__(self, name, **kwargs):
         super().__init__(name, (RustEnumBase,), {})
         self._variants = []
+        self._impls = {}
         for k, v in kwargs.items():
             instance = self(k, (RustEnumVariantBase,), {"_num": v})
             self._variants.append(instance)
@@ -55,3 +64,7 @@ class RustEnum(type):
 
     def __iter__(self):
         return iter(self._variants)
+
+    def impl(self, function):
+        self._impls[function.__name__] = function
+        return function
