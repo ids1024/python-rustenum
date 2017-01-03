@@ -40,10 +40,10 @@ class RustEnumBase(type):
 
 class RustEnum(type):
     def __new__(cls, name, **kwargs):
-        return super().__new__(cls, name, (RustEnumBase,), {"_name": name})
+        return super().__new__(cls, name, (RustEnumBase,), {})
 
     def __init__(self, name, **kwargs):
-        super().__init__(name, (type,), {})
+        super().__init__(name, (RustEnumBase,), {})
         self._variants = []
         for k, v in kwargs.items():
             instance = self(k, (RustEnumVariantBase,), {"_num": v})
