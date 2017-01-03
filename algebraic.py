@@ -11,13 +11,20 @@ class AlgebraicVariantBase(tuple):
 
     def match(self, **kwargs):
         variants = [i.__name__ for i in type(type(self))]
-        if not all(((k in variants or k == '_')
-                      and callable(v))
-                     for k, v in kwargs.items()):
-            raise ValueError
 
-        elif ('_' not in kwargs) and (set(kwargs) != set(variants)):
-            raise ValueError("Does not cover all cases.")
+        for k in kwargs:
+            if k not in variants and k != '_':
+                raise ValueError("'" + k + "' is not a variant of '" +
+                                 type(type(self)).__name__ + "'.")
+
+        for v in kwargs.values():
+            if not callable(v):
+                raise ValueError("'" + repr(v) + "' is not callable.")
+
+        if ('_' not in kwargs) and (set(kwargs) != set(variants)):
+            not_handled = ', '.join(set(variants) - set(kwargs))
+            raise ValueError("Match not cover all cases.\n"
+                             "Not covered: " + not_handled)
 
         if type(self).__name__ in kwargs:
             return kwargs[type(self).__name__](*self)
