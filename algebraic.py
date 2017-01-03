@@ -22,9 +22,14 @@ class Algebraic(type):
 
     def __init__(self, name, **kwargs):
         super().__init__(name, (type,), {})
+        self._variants = []
         for k, v in kwargs.items():
             instance = self(k, (AlgebraicVariantBase,), {"_num": v})
+            self._variants.append(instance)
             setattr(self, k, instance)
 
     def __repr__(self):
         return "<algebraic '" + self.__name__ + "'>"
+
+    def __iter__(self):
+        return iter(self._variants)
