@@ -40,24 +40,30 @@ class RustEnumVariantBase(tuple):
             return kwargs['_']()
 
 
-class RustEnumBase(type):
-    def __repr__(self):
-        name = type(self).__name__ + '.' + self.__name__
-        return "<{}>".format(name)
+class RustEnumMeta(type):
+    def __new__(metacls, cls, bases, classdict):
+        variants = {}
+        impls = {}
 
+        for k in list(classdict):
+            if not k.startswith("_"):
+                if callable(classdict[k]):
+                    impls[k] = (classdict[k])
+                else:
+                    variants[k] = classdict[k]
+                del classdict[k]
 
-class RustEnum(type):
-    def __new__(cls, name, **kwargs):
-        return super().__new__(cls, name, (RustEnumBase,), {})
+        classdict["_variants"] = [];
+        classdict["_impls"] = impls;
 
-    def __init__(self, name, **kwargs):
-        super().__init__(name, (RustEnumBase,), {})
-        self._variants = []
-        self._impls = {}
-        for k, v in kwargs.items():
-            instance = self(k, (RustEnumVariantBase,), {"_num": v})
-            self._variants.append(instance)
-            setattr(self, k, instance)
+        instance = super().__new__(metacls, cls, bases, classdict)
+
+        for k, v in variants.items():
+            subinstance = instance(k, (RustEnumVariantBase,), {"_num": v})
+            instance._variants.append(subinstance)
+            setattr(instance, k, subinstance)
+
+        return instance
 
     def __repr__(self):
         return "<rustenum '" + self.__name__ + "'>"
@@ -68,3 +74,9 @@ class RustEnum(type):
     def impl(self, function):
         self._impls[function.__name__] = function
         return function
+
+
+class RustEnum(type, metaclass=RustEnumMeta):
+    def __repr__(self):
+        name = type(self).__name__ + '.' + self.__name__
+        return "<{}>".format(name)

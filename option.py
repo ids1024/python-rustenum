@@ -1,6 +1,8 @@
 from rustenum import RustEnum
 
-Option = RustEnum("Object", Some=1, None_=0)
+class Option(RustEnum):
+    Some = 1
+    None_ = 0
 
 @Option.impl
 def unwrap(self):
