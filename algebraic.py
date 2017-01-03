@@ -9,6 +9,20 @@ class AlgebraicVariantBase(tuple):
         name = type(type(self)).__name__ + '.' + type(self).__name__
         return "{}({})".format(name, ', '.join(repr(i) for i in self))
 
+    def match(self, matches):
+        if not all(((isinstance(k, type(type(self))) or k is None)
+                      and callable(v))
+                     for k, v in matches.items()):
+            raise ValueError
+
+        elif (None not in matches.keys()) and (set(matches.keys()) != set(self)):
+            raise ValueError("Does not cover all cases.")
+
+        if type(self) in matches:
+            return matches[type(self)](*self)
+        else:
+            return matches[None]()
+
 
 class AlgebraicBase(type):
     def __repr__(self):
