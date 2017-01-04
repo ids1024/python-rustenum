@@ -70,7 +70,7 @@ class RustEnum(tuple, metaclass=RustEnumMeta):
         for k in kwargs:
             if k not in variants and k != '_':
                 raise ValueError("'" + k + "' is not a variant of '" +
-                                 type(type(self)).__name__ + "'.")
+                                 type(self).__name__ + "'.")
 
         for v in kwargs.values():
             if not callable(v):
