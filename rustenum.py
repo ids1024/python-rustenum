@@ -44,7 +44,7 @@ class RustEnumMeta(type):
         return "<rustenum '" + self.__name__ + "'>"
 
     def impl(self, function):
-        self._impls[function.__name__] = function
+        setattr(self, function.__name__, function)
         return function
 
 
@@ -59,11 +59,6 @@ class RustEnum(tuple, metaclass=RustEnumMeta):
         if self:
             name += '('+ ', '.join(repr(i) for i in self) + ')'
         return name
-
-    def __getattr__(self, name):
-        if name in type(self)._impls:
-            return types.MethodType(type(self)._impls[name], self)
-        raise AttributeError
 
     def __eq__(self, other):
         return (type(self) == type(other) and
