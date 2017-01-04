@@ -65,6 +65,11 @@ class RustEnum(tuple, metaclass=RustEnumMeta):
             return types.MethodType(type(self)._impls[name], self)
         raise AttributeError
 
+    def __eq__(self, other):
+        return (type(self) == type(other) and
+                self._variant == other._variant and
+                super().__eq__(other))
+
     def match(self, **kwargs):
         variants = type(self)._variants
 
