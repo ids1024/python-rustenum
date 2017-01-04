@@ -22,7 +22,7 @@ class RustEnumMeta(type):
         variants = {}
 
         for k in list(classdict):
-            if not (k.startswith("_") or callable(classdict[k])):
+            if not k.startswith("_") and isinstance(classdict[k], int):
                 variants[k] = classdict[k]
                 del classdict[k]
 
@@ -41,10 +41,6 @@ class RustEnumMeta(type):
 
     def __repr__(self):
         return "<rustenum '" + self.__name__ + "'>"
-
-    def impl(self, function):
-        setattr(self, function.__name__, function)
-        return function
 
 
 class RustEnum(tuple, metaclass=RustEnumMeta):
@@ -85,3 +81,8 @@ class RustEnum(tuple, metaclass=RustEnumMeta):
             return kwargs[self._variant](*self)
         else:
             return kwargs['_']()
+
+    @classmethod
+    def impl(cls, function):
+        setattr(cls, function.__name__, function)
+        return function
