@@ -13,6 +13,13 @@ def unwrap(self):
         Some = lambda x: x,
         None_ = fail
     )
+    
+@Option.impl
+def map(self, callback):
+    return self.match(
+        Some = lambda x: Some(callback(x)),
+        None_ = lambda: None_
+    )
 
 Some = Option.Some
 None_ = Option.None_
