@@ -36,7 +36,10 @@ class RustEnumMeta(type):
         instance = super().__new__(metacls, cls, bases, classdict)
 
         for k, v in variants.items():
-            variant = RustEnumVariant(instance, k, v)
+            if v:
+                variant = RustEnumVariant(instance, k, v)
+            else:
+                variant = instance(k, ())
             setattr(instance, k, variant)
 
         return instance
@@ -57,7 +60,9 @@ class RustEnum(tuple, metaclass=RustEnumMeta):
 
     def __repr__(self):
         name = type(self).__name__ + '.' + self._variant
-        return "{}({})".format(name, ', '.join(repr(i) for i in self))
+        if self:
+            name += '('+ ', '.join(repr(i) for i in self) + ')'
+        return name
 
     def __getattr__(self, name):
         if name in type(self)._impls:
