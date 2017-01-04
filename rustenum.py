@@ -20,18 +20,14 @@ class RustEnumVariant:
 class RustEnumMeta(type):
     def __new__(metacls, cls, bases, classdict):
         variants = {}
-        impls = {}
 
         for k in list(classdict):
-            if not k.startswith("_") and not k == "match":
-                if callable(classdict[k]):
-                    impls[k] = (classdict[k])
-                else:
-                    variants[k] = classdict[k]
+            if not (k.startswith("_") or callable(classdict[k])):
+                variants[k] = classdict[k]
                 del classdict[k]
 
         classdict["_variants"] = variants;
-        classdict["_impls"] = impls;
+        classdict["_impls"] = {};
 
         instance = super().__new__(metacls, cls, bases, classdict)
 
