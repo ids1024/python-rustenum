@@ -12,6 +12,11 @@ class RustEnumVariant:
             raise TypeError("Wrong number of arguments to " + repr(self))
         return self._enum_class(self._name, args)
 
+    def __get__(self, instance, owner):
+        if self._num == 0:
+            return self()
+        return self
+
     def __repr__(self):
         return self._enum_class.__name__ + '.' + self._name
 
@@ -30,10 +35,7 @@ class RustEnumMeta(type):
         instance = super().__new__(metacls, cls, bases, classdict)
 
         for k, v in variants.items():
-            if v:
-                variant = RustEnumVariant(instance, k, v)
-            else:
-                variant = instance(k, ())
+            variant = RustEnumVariant(instance, k, v)
             setattr(instance, k, variant)
 
         return instance
