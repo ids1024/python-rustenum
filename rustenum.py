@@ -27,7 +27,6 @@ class RustEnumMeta(type):
                 del classdict[k]
 
         classdict["_variants"] = variants;
-        classdict["_impls"] = {};
 
         instance = super().__new__(metacls, cls, bases, classdict)
 
