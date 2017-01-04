@@ -9,8 +9,7 @@ class RustEnumVariant:
 
     def __call__(self, *args):
         if len(args) != self._num:
-            name = self._enum_class.__name__ + '.' + self._name
-            raise TypeError("Wrong number of arguments to " + name)
+            raise TypeError("Wrong number of arguments to " + repr(self))
         return self._enum_class(self._name, args)
 
     def __repr__(self):
