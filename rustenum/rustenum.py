@@ -64,10 +64,10 @@ class RustEnum(tuple, metaclass=RustEnumMeta):
             if not callable(v):
                 raise ValueError("'" + repr(v) + "' is not callable.")
 
-        if ('_' not in kwargs) and (set(kwargs) != set(variants)):
-            not_handled = ', '.join(set(variants) - set(kwargs))
+        not_handled = set(variants) - set(kwargs)
+        if ('_' not in kwargs) and not_handled:
             raise ValueError("Match not cover all cases.\n"
-                             "Not covered: " + not_handled)
+                             "Not covered: " + ', '.join(not_handled))
 
         if self._variant in kwargs:
             return kwargs[self._variant](*self)
