@@ -26,8 +26,8 @@ class RustEnumMeta(type):
         self._variants = {}
 
         for k, v in classdict.items():
-            if not k.startswith("_") and isinstance(classdict[k], int):
-                self._variants[k] = classdict[k]
+            if not k.startswith("_") and isinstance(v, int):
+                self._variants[k] = v
                 variant = RustEnumVariant(self, k, v)
                 setattr(self, k, variant)
 
