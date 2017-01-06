@@ -23,20 +23,14 @@ class RustEnumVariant:
 
 class RustEnumMeta(type):
     def __new__(metacls, cls, bases, classdict):
-        variants = {}
-
-        for k in list(classdict):
-            if not k.startswith("_") and isinstance(classdict[k], int):
-                variants[k] = classdict[k]
-                del classdict[k]
-
-        classdict["_variants"] = variants;
-
         instance = super().__new__(metacls, cls, bases, classdict)
+        instance._variants = {}
 
-        for k, v in variants.items():
-            variant = RustEnumVariant(instance, k, v)
-            setattr(instance, k, variant)
+        for k, v in classdict.items():
+            if not k.startswith("_") and isinstance(classdict[k], int):
+                instance._variants[k] = classdict[k]
+                variant = RustEnumVariant(instance, k, v)
+                setattr(instance, k, variant)
 
         return instance
 
